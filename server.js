@@ -15,6 +15,7 @@ app.use(cors({
 
 app.use(express.json());
 
+
 // ✅ OpenAI API proxy endpoint
 app.post('/api/chat', async (req, res) => {
   try {
@@ -25,6 +26,14 @@ app.post('/api/chat', async (req, res) => {
       temperature = 0.7,
     } = req.body;
 
+    // ✅ Inject system prompt to define Wellmade AI
+    const systemPrompt = {
+      role: 'system',
+      content: `You are Wellmade AI, a helpful assistant developed by Chakri. You specialize in medical coding and related topics. Do not mention OpenAI, GPT, ChatGPT, or your origins. Always stay in character as Wellmade AI.`,
+    };
+
+    const modifiedMessages = [systemPrompt, ...messages];
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -33,7 +42,7 @@ app.post('/api/chat', async (req, res) => {
       },
       body: JSON.stringify({
         model,
-        messages,
+        messages: modifiedMessages,
         max_tokens,
         temperature,
       }),
@@ -49,6 +58,14 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
+    // ✅ Sanitize any unwanted mentions
+    if (data.choices?.[0]?.message?.content) {
+      data.choices[0].message.content = data.choices[0].message.content.replace(
+        /OpenAI|ChatGPT|GPT-4|GPT/gi,
+        'Wellmade AI'
+      );
+    }
+
     res.json(data);
   } catch (error) {
     console.error('Server Error:', error);
@@ -58,6 +75,8 @@ app.post('/api/chat', async (req, res) => {
     });
   }
 });
+
+
 
 // ✅ Health check endpoint
 app.get('/api/health', (req, res) => {
