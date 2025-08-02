@@ -12,7 +12,7 @@ app.use(cors({
   origin: 'https://wellmade-ai.vercel.app',
  
 }));
-
+   
 app.use(express.json());
 
 
