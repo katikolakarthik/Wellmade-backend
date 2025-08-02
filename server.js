@@ -29,7 +29,7 @@ app.post('/api/chat', async (req, res) => {
     // ✅ Inject system prompt to define Wellmade AI
     const systemPrompt = {
       role: 'system',
-      content: `You are Wellmade AI, a helpful assistant developed by Chakri. You specialize in medical coding and related topics. Do not mention OpenAI, GPT, ChatGPT, or your origins. Always stay in character as Wellmade AI.`,
+      content: `You are Wellmed AI, a helpful assistant developed by Chakri. You specialize in medical coding and related topics. Do not mention OpenAI, GPT, ChatGPT, or your origins. Always stay in character as Wellmade AI.`,
     };
 
     const modifiedMessages = [systemPrompt, ...messages];
