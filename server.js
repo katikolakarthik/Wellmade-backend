@@ -22,7 +22,7 @@ app.post('/api/chat', async (req, res) => {
     const {
       messages,
       model = 'gpt-4o-mini',
-      max_tokens = 2500,
+      max_tokens = 2500 ,
       temperature = 0.7,
     } = req.body;
 
