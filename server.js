@@ -16,6 +16,7 @@ app.use(cors({
 app.use(express.json());
 
 
+
 // ✅ OpenAI API proxy endpoint
 app.post('/api/chat', async (req, res) => {
   try {
@@ -25,6 +26,22 @@ app.post('/api/chat', async (req, res) => {
       max_tokens = 4000,
       temperature = 0.7,
     } = req.body;
+
+    // ✅ Get the latest user message
+    const lastUserMessage = messages?.slice().reverse().find(m => m.role === 'user')?.content || '';
+
+    // ✅ Simple keyword-based filter
+    const allowedKeywords = ['icd', 'cpt', 'medical', 'diagnosis', 'procedure', 'coding', 'code', 'modifier', 'claims', 'insurance', 'rbs', 'hba1c', 'medication', 'treatment', 'billing'];
+    const isMedicalRelated = allowedKeywords.some(keyword =>
+      lastUserMessage.toLowerCase().includes(keyword)
+    );
+
+    // ❌ If unrelated, block the request
+    if (!isMedicalRelated) {
+      return res.status(400).json({
+        error: 'This assistant only answers medical coding-related questions. Please ask something relevant to medical coding.',
+      });
+    }
 
     // ✅ Inject system prompt to define Wellmade AI
     const systemPrompt = {
@@ -75,6 +92,10 @@ app.post('/api/chat', async (req, res) => {
     });
   }
 });
+
+
+
+
 
 
 
